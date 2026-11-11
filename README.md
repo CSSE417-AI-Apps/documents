@@ -4,7 +4,8 @@ Winter 2026-2027 · Rose-Hulman Institute of Technology · Dr. Fisher
 
 Quick links:
 - Syllabus *(TODO: add link)*
-- [Claude Pro setup](Guides/Claude_Pro_Setup.md) (do this before Day 1)
+- [Claude Pro setup](Guides/Claude_Pro_Setup.md) (do this before Day 2)
+- GitHub setup: [join the course org](Guides/GitHub_Org_Setup.md) · [make a new repo](Guides/GitHub_New_Repo.md) · [GitHub MCP](Guides/GitHub_MCP_Setup.md) · [PR workflow](Guides/GitHub_PR_Workflow.md)
 - Google Cloud credits setup *(coming soon)*
 - [Labs and projects](Labs/)
 - [Lecture slides](Slides/)
@@ -14,9 +15,9 @@ Quick links:
 | Day | Date | Focus for the class day | References and links |
 |:---:|:---:|---|---|
 | **Week 1** | | | |
-| 1 | Monday<br>Nov 30 | • Course introduction<br>• Introduce Project 1: Podcast Agent | • [Course intro slides](Slides/Day01_Course_Intro.md)<br>• [Claude Pro setup](Guides/Claude_Pro_Setup.md)<br>• [Project 1 instructions](Labs/Project_1_Podcast_Agent.md) |
-| 2 | Tuesday<br>Dec 1 |  | |
-| 3 | Thursday<br>Dec 3 |  | |
+| 1 | Monday<br>Nov 30 | • Course introduction<br>• Introduce Project 0: Git Workflow<br>• Introduce Project 1: Podcast Agent | • [Course intro slides](Slides/Day01_Course_Intro.md)<br>• **Assign:** [Project 0 instructions](Labs/Project_0_Git_Workflow.md)<br>• [Project 1 instructions](Labs/Project_1_Podcast_Agent.md) |
+| 2 | Tuesday<br>Dec 1 |  | • **Due:** [Claude Pro setup](Guides/Claude_Pro_Setup.md) |
+| 3 | Thursday<br>Dec 3 |  | • **Due:** [Project 0: Git Workflow](Labs/Project_0_Git_Workflow.md) |
 | 4 | Friday<br>Dec 4<br>*Last day to add a class* |  | |
 | **Week 2** | | | |
 | 5 | Monday<br>Dec 7 |  | |

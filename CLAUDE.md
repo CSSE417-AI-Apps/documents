@@ -61,4 +61,5 @@ Meeting weeks: Weeks 1-3 = Nov 30 – Dec 18 (12 meetings), holiday break, Weeks
 - Images go in an `images/` folder next to the doc that uses them, with descriptive filenames. Embed them with HTML `<img>` tags with an explicit `width` (same convention as the ME435 documents repo).
 - If you rename a heading, update any links that point to its GitHub anchor slug.
 - Don't guess at private Rose-Hulman or Moodle links. Mark them `*(TODO: add link)*`.
+- This repo and all student repos are public. Never put student names, rosters, team lists or grades in them. Collect that kind of information through Moodle.
 - Make focused edits, and don't commit unless asked.

@@ -8,7 +8,7 @@ In CSSE 417 we all use the same AI coding assistant, **Claude Code**, inside VS 
 4. [Learning to use Claude in VS Code](#4-learning-to-use-claude-in-vs-code)
 5. [Practice: explore this course repo with Claude](#5-practice-explore-this-course-repo-with-claude)
 
-**Finish this before the first day of class (Monday, Nov 30).**
+**Finish this before Day 2 (Tuesday, Dec 1).**
 
 ---
 
