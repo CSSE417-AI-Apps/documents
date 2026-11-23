@@ -6,7 +6,7 @@ paginate: true
 <!-- _class: lead -->
 
 # Phase 0: Command Line Podcast Search
-### Discovery → (Audio Download) → Transcripts → Chunks → Embeddings → Vector Search
+### Discovery → Audio/VTT Download → Transcripts → Chunks → Embeddings → Vector Search
 
 <img src="images/phase0_logo.svg" width="560" alt="Podcasts → Vector Database → Search">
 
@@ -38,18 +38,18 @@ a nicer UI, Gemini, or the cloud won't fix it. That's why we start here.
 
 ## Details of Phase 0
 
-<img src="images/phase0_stages.svg" width="1000" alt="Discovery → (Audio Download) → Transcripts → Chunks → Embeddings → Vector Search">
+<img src="images/phase0_stages.svg" width="1000" alt="Discovery → Audio/VTT Download → Transcripts → Chunks → Embeddings → Vector Search">
 
 - **Discovery:** read the podcast's RSS feed: every episode, its mp3, maybe a transcript
-- **(Audio Download):** only if the feed has no transcript
-- **Transcripts:** text with timestamps, from the feed or from Whisper
+- **Audio/VTT Download:** the feed's transcript (VTT) if it has one, otherwise the mp3
+- **Transcripts:** always the same JSON: converted from the VTT, or Whisper on the mp3
 - **Chunks:** about a minute of conversation each
 - **Embeddings:** each chunk becomes a vector of numbers
 - **Vector Search:** your question becomes a vector too; find the nearest chunks
 
 <!--
-Audio Download is in parentheses (and drawn dashed) because it's optional:
-Tech Won't Save Us publishes transcripts, so we never downloaded its audio.
+We always download something: a VTT when the feed publishes a transcript (Tech Won't Save Us),
+otherwise the mp3. Then we always "transcribe", and the next stage can't tell which path was used.
 The rest of this deck walks through these boxes from left to right.
 -->
 
@@ -105,11 +105,11 @@ We'll keep adding lines to this data layout as we go through the stages.
 
 ---
 
-## 2. (Audio Download): only when needed
+## 2. Audio/VTT Download
 
-<img src="images/phase0_stage2_download.svg" width="760" alt="Phase 0 stages with Audio Download highlighted">
+<img src="images/phase0_stage2_download.svg" width="760" alt="Phase 0 stages with Audio/VTT Download highlighted">
 
-| Podcast | Feed has a transcript | Needs audio |
+| Podcast | Download the VTT | Download the mp3 |
 |---|---|---|
 | Tech Won't Save Us | 370 | 1 |
 | Practical AI | 77 (since 2025) | 306 (236 h, 15 GB) |
@@ -118,7 +118,7 @@ We'll keep adding lines to this data layout as we go through the stages.
 ```
 data/
   {podcast}/episodes.json              1. one dict per episode
-  {podcast}/raw_transcripts/{slug}.*   2. feed transcripts as published (.vtt, .json)
+  {podcast}/raw_transcripts/{slug}.*   2. the feed transcript as published (.vtt or .srt)
   {podcast}/audio/{slug}.mp3           2. only if the feed has no transcript
 ```
 
@@ -267,8 +267,8 @@ config.py and search.py sit at the top of the project, because the Phase 1 Flask
 | Filename | Description | Output |
 |---|---|---|
 | `s1_discover.py` | Collects podcast and episode details | `episodes.json` |
-| `s2_download.py` | Downloads the feed's transcript, or the audio if there isn't one | `raw_transcripts/{slug}.vtt` or `audio/{slug}.mp3` |
-| `s3_transcribe.py` | Converts audio (or a feed VTT) to timed text | `transcripts/{slug}.json` |
+| `s2_download.py` | Downloads the feed's transcript, or the audio if there isn't one | `raw_transcripts/{slug}.vtt` (or `.srt`) or `audio/{slug}.mp3` |
+| `s3_transcribe.py` | Converts audio (or a feed VTT/SRT) to timed text | `transcripts/{slug}.json` |
 
 All in `data/{podcast}/`.
 
@@ -294,7 +294,7 @@ s4 and s5 are in phase_0_command_line_search/. search.py is at the top, shared w
 
 ## Part 1: Getting the data
 
-<img src="images/phase0_part1_data.svg" width="1000" alt="Phase 0 stages with Discovery, Audio Download, and Transcripts highlighted">
+<img src="images/phase0_part1_data.svg" width="1000" alt="Phase 0 stages with Discovery, Audio/VTT Download, and Transcripts highlighted">
 
 <!--
 s1_discover, s2_download, s3_transcribe: from an RSS feed to timed transcripts.
@@ -329,7 +329,21 @@ To find a podcast's feed URL, search Apple's iTunes Search API by name.
 
 ---
 
-## Two ways to get a transcript
+## Two ways to get a transcript: overview
+
+<img src="images/two_ways_to_transcript.svg" width="900" alt="raw_transcripts/{slug}.vtt or .srt (convert, seconds) and audio/{slug}.mp3 (Whisper, minutes) both become transcripts/{slug}.json">
+
+s3 turns both paths into **one** format, so every later stage sees the same JSON.
+
+<!--
+s2 always downloads something: the VTT (or SRT) if the feed has a transcript, otherwise the mp3.
+s3 always produces a transcript: a quick conversion, or a slow Whisper run.
+From s4 on, nothing knows or cares which path an episode took.
+-->
+
+---
+
+## Two ways to get a transcript: details
 
 **The feed publishes one.** Tech Won't Save Us links a VTT file for 370 of 371 episodes:
 
@@ -341,10 +355,13 @@ To find a podcast's feed URL, search Apple's iTunes Search API by name.
 **Or run Whisper yourself.** Practical AI before 2025, and Open Circuit:
 `faster-whisper` with `large-v3-turbo` ran about **17× realtime** on a laptop GPU, so a 45-minute episode takes under 3 minutes.
 
-Check your podcast's RSS feed for `<podcast:transcript>` before you transcribe anything.
+Check your podcast's RSS feed for `<podcast:transcript>` (VTT or SRT) before you transcribe anything.
 
 <!--
 Buzzsprout and Transistor hosts publish transcripts; Megaphone and Simplecast feeds didn't.
+SRT is VTT's older cousin: numbered cues, commas in the times, and speakers written as "SPEAKER_00: ..."
+instead of <v SPEAKER_00>. The same parser reads both. Feeds may also offer JSON (layout differs by host),
+HTML, or plain text (no timestamps); we skip those.
 Whisper at 17x realtime is still about a day for 400 hours of audio. Start it early and let it run overnight.
 On a CPU, smaller models (small.en) are a better fit.
 -->
@@ -358,7 +375,7 @@ On a CPU, smaller models (small.en) are a better fit.
 | If... | Then |
 |---|---|
 | `transcripts/{slug}.json` already exists | skip it |
-| the feed links a timed transcript (VTT or JSON) | save it, as published, to `raw_transcripts/` |
+| the feed links a timed transcript (VTT, else SRT) | save it, as published, to `raw_transcripts/` |
 | otherwise | download the mp3 to `audio/` |
 
 - Downloads stream to `{slug}.mp3.part`, renamed only when complete
@@ -376,7 +393,7 @@ Flags: --audio-only, --transcripts-only, --limit, --force, --podcast.
 
 `python -m phase_0_command_line_search.s3_transcribe` → `transcripts/{slug}.json`
 
-**From a feed VTT** (seconds): parse the cues, keep the `<v Speaker>` names, split long cues into sentences (≤ 300 characters)
+**From a feed VTT or SRT** (seconds): parse the cues, keep the speaker names, split long cues into sentences (≤ 300 characters)
 
 **From an mp3** (minutes): `faster-whisper`
 

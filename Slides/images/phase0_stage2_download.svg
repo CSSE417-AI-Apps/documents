@@ -14,7 +14,7 @@
     </marker>
   </defs>
 
-  <!-- highlight: this slide's stage -->
+  <!-- highlight -->
   <rect x="263" y="10" width="224" height="286" rx="22" fill="#FFF4EF" stroke="#E8572A" stroke-width="3" stroke-dasharray="10 8"/>
 
   <!-- 1. Discovery: RSS feed -->
@@ -29,19 +29,19 @@
 
   <line x1="200" y1="112" x2="290" y2="112" stroke="#9CA3AF" stroke-width="8" marker-end="url(#head)"/>
 
-  <!-- 2. (Audio download): optional, so drawn dashed and grey -->
+  <!-- 2. Audio/VTT download: the feed's transcript (VTT) if it has one, otherwise the mp3 -->
   <g transform="translate(375,0)">
-    <rect x="-68" y="42" width="136" height="146" rx="20" fill="none" stroke="#9CA3AF" stroke-width="4" stroke-dasharray="10 8"/>
-    <g stroke="#6B7280" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <g stroke="#1F2937" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round">
       <line x1="0" y1="62" x2="0" y2="128"/>
       <path d="M-26,104 L0,130 L26,104"/>
-      <path d="M-42,130 V160 H42 V130"/>
+      <path d="M-50,130 V166 H50 V130"/>
     </g>
-    <g fill="#6B7280">
-      <ellipse cx="-38" cy="86" rx="9" ry="7"/>
-      <rect x="-31" y="58" width="4" height="29"/>
-      <path d="M-31,58 L-17,64 L-17,72 L-31,66 Z"/>
+    <g fill="#E8572A">
+      <ellipse cx="-42" cy="90" rx="10" ry="8"/>
+      <rect x="-34" y="58" width="5" height="33"/>
+      <path d="M-34,58 L-18,65 L-18,74 L-34,67 Z"/>
     </g>
+    <text x="38" y="88" font-size="22" font-weight="700" fill="#E8572A" text-anchor="middle">VTT</text>
   </g>
 
   <line x1="460" y1="112" x2="540" y2="112" stroke="#9CA3AF" stroke-width="8" marker-end="url(#head)"/>
@@ -106,8 +106,8 @@
   <!-- labels -->
   <g font-size="30" font-weight="700" fill="#1F2937" text-anchor="middle">
     <text x="125"  y="250">Discovery</text>
-    <text x="375"  y="250" fill="#E8572A">(Audio</text>
-    <text x="375"  y="284" fill="#E8572A">Download)</text>
+    <text x="375"  y="250" fill="#E8572A">Audio/VTT</text>
+    <text x="375"  y="284" fill="#E8572A">Download</text>
     <text x="625"  y="250">Transcripts</text>
     <text x="875"  y="250">Chunks</text>
     <text x="1125" y="250">Embeddings</text>

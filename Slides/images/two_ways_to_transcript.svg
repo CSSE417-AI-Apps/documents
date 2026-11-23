@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 470" width="1200" height="470" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="head" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#9CA3AF"/>
+    </marker>
+  </defs>
+
+  <!-- column headings: which script makes each column -->
+  <g font-size="26" font-weight="700" fill="#6B7280" text-anchor="middle" font-family="Menlo, Consolas, monospace">
+    <text x="240" y="34">s2_download</text>
+    <text x="600" y="34">s3_transcribe</text>
+    <text x="960" y="34">s4_chunk reads</text>
+  </g>
+
+  <!-- top: the feed published a transcript -->
+  <rect x="40" y="60" width="400" height="150" rx="18" fill="#FDE7DF" stroke="#E8572A" stroke-width="5"/>
+  <text x="240" y="108" font-size="30" font-weight="700" fill="#1F2937" text-anchor="middle">The feed has a transcript</text>
+  <text x="240" y="152" font-size="24" fill="#1F2937" text-anchor="middle" font-family="Menlo, Consolas, monospace">raw_transcripts/</text>
+  <text x="240" y="184" font-size="24" fill="#1F2937" text-anchor="middle" font-family="Menlo, Consolas, monospace">{slug}.vtt or .srt</text>
+
+  <!-- bottom: audio only -->
+  <rect x="40" y="290" width="400" height="150" rx="18" fill="#E1EDFB" stroke="#4A90E2" stroke-width="5"/>
+  <text x="240" y="338" font-size="30" font-weight="700" fill="#1F2937" text-anchor="middle">Audio only</text>
+  <text x="240" y="382" font-size="24" fill="#1F2937" text-anchor="middle" font-family="Menlo, Consolas, monospace">audio/</text>
+  <text x="240" y="414" font-size="24" fill="#1F2937" text-anchor="middle" font-family="Menlo, Consolas, monospace">{slug}.mp3</text>
+
+  <!-- arrows converge on one format -->
+  <path d="M440,135 C600,135 620,230 752,230" fill="none" stroke="#9CA3AF" stroke-width="8" marker-end="url(#head)"/>
+  <path d="M440,365 C600,365 620,270 752,270" fill="none" stroke="#9CA3AF" stroke-width="8" marker-end="url(#head)"/>
+  <text x="600" y="128" font-size="26" font-weight="700" fill="#E8572A" text-anchor="middle">convert</text>
+  <text x="600" y="160" font-size="22" fill="#6B7280" text-anchor="middle">seconds</text>
+  <text x="600" y="400" font-size="26" font-weight="700" fill="#4A90E2" text-anchor="middle">Whisper</text>
+  <text x="600" y="432" font-size="22" fill="#6B7280" text-anchor="middle">minutes</text>
+
+  <!-- right: one JSON transcript -->
+  <rect x="770" y="160" width="390" height="180" rx="18" fill="#FCF1CF" stroke="#E0A800" stroke-width="5"/>
+  <text x="965" y="210" font-size="30" font-weight="700" fill="#1F2937" text-anchor="middle">JSON transcript</text>
+  <text x="965" y="254" font-size="24" fill="#1F2937" text-anchor="middle" font-family="Menlo, Consolas, monospace">transcripts/</text>
+  <text x="965" y="286" font-size="24" fill="#1F2937" text-anchor="middle" font-family="Menlo, Consolas, monospace">{slug}.json</text>
+  <text x="965" y="320" font-size="20" fill="#6B7280" text-anchor="middle" font-family="Menlo, Consolas, monospace">{start, end, speaker, text}</text>
+</svg>
