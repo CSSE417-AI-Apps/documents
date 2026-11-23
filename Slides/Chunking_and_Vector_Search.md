@@ -59,11 +59,13 @@ The rest of this deck walks through these boxes from left to right.
 
 ```
 $ python search.py "energy and water use of data centers"
-
-[1] 0.694  Tech Won't Save Us | Canada's Government is Rushing AI Adoption | 40:49
-[2] 0.688  Tech Won't Save Us | Time for a Butlerian Jihad?: A 'Dune' Chat | 1:21:39
-[3] 0.668  Tech Won't Save Us | Why Countries Must Fight For Digital Sovereignty | 16:38
 ```
+
+| | Similarity | Podcast | Episode | Time ▶ |
+|---|---|---|---|---|
+| 1 | 0.694 | Tech Won't Save Us | Canada's Government is Rushing AI Adoption | [40:49](https://pscrb.fm/rss/p/www.buzzsprout.com/1004689/episodes/19345841-canada-s-government-is-rushing-ai-adoption-w-hadrian-mertins-kirkwood.mp3#t=2449) |
+| 2 | 0.688 | Tech Won't Save Us | Time for a Butlerian Jihad?: A 'Dune' Chat | [1:21:39](https://pscrb.fm/rss/p/www.buzzsprout.com/1004689/episodes/19218316-time-for-a-butlerian-jihad-a-dune-chat-w-ed-ongweso-jr-brian-merchant.mp3#t=4899) |
+| 3 | 0.668 | Tech Won't Save Us | Why Countries Must Fight For Digital Sovereignty | [16:38](https://pscrb.fm/rss/p/www.buzzsprout.com/1004689/episodes/19218226-why-countries-must-fight-for-digital-sovereignty-w-cecilia-rikap.mp3#t=998) |
 
 The right episode **and the right minute**, from hundreds of hours of audio.
 None of those titles mentions energy, water, or data centers.
@@ -73,8 +75,9 @@ All three are Tech Won't Save Us. #2 is a conversation about Dune that turns to
 communities fighting Google data centers over water use.
 Keyword search on titles or show notes would never find that minute.
 The timestamps matter because the web app will jump the audio player to that moment.
-The real output also prints the passage and a link that starts playing at that second:
-the mp3 URL plus "#t=2449" (the W3C media fragment standard), which works for any podcast host.
+LIVE DEMO: click a time. It opens the mp3 at that second: the mp3 URL plus "#t=2449"
+(the W3C media fragment standard), which works for any podcast host.
+The real CLI output also prints the passage text and that same link.
 -->
 
 ---
@@ -86,9 +89,9 @@ the mp3 URL plus "#t=2449" (the W3C media fragment standard), which works for an
 Every podcast publishes a free **RSS feed**: one XML file listing every episode and its mp3.
 We turn each feed into a clean `episodes.json`.
 
-| Tech Won't Save Us | Practical AI | Open Circuit | BibleProject | Exploring My Strange Bible |
+| Tech Won't Save Us | Practical AI | Open Circuit | BibleProject | My Strange Bible |
 |---|---|---|---|---|
-| 371 episodes, 339 h | 383, 297 h | 95, 86 h | 550, 513 h | 127, 108 h |
+| 371 (339 h) | 383 (297 h) | 95 (86 h) | 550 (513 h) | 127 (108 h) |
 
 ```
 data/                                  (gitignored: never commit data)
@@ -180,7 +183,7 @@ We'll come back to 500 vs 1000 with real search results later in the deck.
 - About 70,000 chunks embedded in **10 minutes**
 
 ```
-data/chroma/                           5. one collection per chunk size, all podcasts
+data/chromadb/chunks_{size}/           5. one ChromaDB per chunk size, all podcasts
 ```
 
 <!--
@@ -215,7 +218,7 @@ only compares direction, which is what an embedding's "meaning" is.
 
 A **mindset** we'll follow all quarter, not just in Phase 0.
 
-- Each stage is its own script: `python -m pipeline.s4_chunk`
+- Each stage is its own script: `python -m phase_0_command_line_search.s4_chunk`
 - Reads the previous stage's folder, writes its own
 - **Skips work that's already done**, so a crash halfway costs nothing
 - `--limit 10`: try it on 10 episodes first · `--force`: redo it anyway
@@ -245,9 +248,63 @@ This is also a natural place to stop lecturing and start building.
 
 ---
 
+## The files: shared settings
+
+| Filename | Description | Output |
+|---|---|---|
+| `config.py` | Holds global configuration data | No output. Holds JSON-like data, but in a `.py` file |
+
+<!--
+The podcast list (key, title, RSS feed), chunk sizes, the Whisper model, and helper
+functions that build every path in the data layout. Every other file imports it.
+config.py and search.py sit at the top of the project, because the Phase 1 Flask app imports them too.
+-->
+
+---
+
+## The files: getting transcripts
+
+| Filename | Description | Output |
+|---|---|---|
+| `s1_discover.py` | Collects podcast and episode details | `episodes.json` |
+| `s2_download.py` | Downloads the feed's transcript, or the audio if there isn't one | `raw_transcripts/{slug}.vtt` or `audio/{slug}.mp3` |
+| `s3_transcribe.py` | Converts audio (or a feed VTT) to timed text | `transcripts/{slug}.json` |
+
+All in `data/{podcast}/`.
+
+<!--
+These three are in phase_0_command_line_search/. s3 is the slow one (Whisper).
+-->
+
+---
+
+## The files: making it searchable
+
+| Filename | Description | Output |
+|---|---|---|
+| `s4_chunk.py` | Groups transcript segments into chunks | `data/{podcast}/chunks/{size}/{slug}.json` |
+| `s5_index.py` | Embeds the chunks and stores them in ChromaDB | `data/chromadb/chunks_{size}/` |
+| `search.py` | Searches ChromaDB from the command line | Results in the terminal |
+
+<!--
+s4 and s5 are in phase_0_command_line_search/. search.py is at the top, shared with Phase 1.
+-->
+
+---
+
+## Part 1: Getting the data
+
+<img src="images/phase0_part1_data.svg" width="1000" alt="Phase 0 stages with Discovery, Audio Download, and Transcripts highlighted">
+
+<!--
+s1_discover, s2_download, s3_transcribe: from an RSS feed to timed transcripts.
+-->
+
+---
+
 ## s1_discover
 
-`python -m pipeline.s1_discover` → `data/{podcast}/episodes.json`
+`python -m phase_0_command_line_search.s1_discover` → `data/{podcast}/episodes.json`
 
 1. Download each podcast's RSS feed (`requests`)
 2. Parse the XML (`xml.etree.ElementTree`); one `<item>` per episode
@@ -294,6 +351,52 @@ On a CPU, smaller models (small.en) are a better fit.
 
 ---
 
+## s2_download
+
+`python -m phase_0_command_line_search.s2_download`: for each episode in `episodes.json`:
+
+| If... | Then |
+|---|---|
+| `transcripts/{slug}.json` already exists | skip it |
+| the feed links a timed transcript (VTT or JSON) | save it, as published, to `raw_transcripts/` |
+| otherwise | download the mp3 to `audio/` |
+
+- Downloads stream to `{slug}.mp3.part`, renamed only when complete
+- So a crash or Ctrl-C never leaves a half file that looks finished
+
+<!--
+Raw transcripts are kept unchanged so stage 3 can re-convert them later (for example,
+with better speaker handling) without downloading again.
+Flags: --audio-only, --transcripts-only, --limit, --force, --podcast.
+-->
+
+---
+
+## s3_transcribe
+
+`python -m phase_0_command_line_search.s3_transcribe` → `transcripts/{slug}.json`
+
+**From a feed VTT** (seconds): parse the cues, keep the `<v Speaker>` names, split long cues into sentences (≤ 300 characters)
+
+**From an mp3** (minutes): `faster-whisper`
+
+```python
+model = WhisperModel("large-v3-turbo", device="mps", compute_type="float16")
+segments, info = model.transcribe("episode.mp3", language="en",
+                                  vad_filter=True,                   # skip silence and music
+                                  condition_on_previous_text=False)  # avoid repeated-line loops
+```
+
+Ctrl-C finishes the current episode, then stops. Rerun to continue.
+
+<!--
+device="mps" is the Apple silicon GPU; on other machines use "auto" (CUDA if available, else CPU).
+For the long run: nohup caffeinate -i python -u -m phase_0_command_line_search.s3_transcribe --whisper-only > data/logs/s3_whisper_log.txt &
+Whisper doesn't identify speakers, so speaker is null for those transcripts.
+-->
+
+---
+
 ## What a transcript looks like
 
 Both paths produce the same shape: text **and timed segments**.
@@ -321,48 +424,12 @@ but you can't jump the player to the right moment. That's a real tradeoff for yo
 
 ---
 
-## s2_download
+## Part 2: Vectorizing the data
 
-`python -m pipeline.s2_download`: for each episode in `episodes.json`:
-
-| If... | Then |
-|---|---|
-| `transcripts/{slug}.json` already exists | skip it |
-| the feed links a timed transcript (VTT or JSON) | save it, as published, to `raw_transcripts/` |
-| otherwise | download the mp3 to `audio/` |
-
-- Downloads stream to `{slug}.mp3.part`, renamed only when complete
-- So a crash or Ctrl-C never leaves a half file that looks finished
+<img src="images/phase0_part2_vectors.svg" width="1000" alt="Phase 0 stages with Chunks, Embeddings, and Vector Search highlighted">
 
 <!--
-Raw transcripts are kept unchanged so stage 3 can re-convert them later (for example,
-with better speaker handling) without downloading again.
-Flags: --audio-only, --transcripts-only, --limit, --force, --podcast.
--->
-
----
-
-## s3_transcribe
-
-`python -m pipeline.s3_transcribe` → `transcripts/{slug}.json`
-
-**From a feed VTT** (seconds): parse the cues, keep the `<v Speaker>` names, split long cues into sentences (≤ 300 characters)
-
-**From an mp3** (minutes): `faster-whisper`
-
-```python
-model = WhisperModel("large-v3-turbo", device="mps", compute_type="float16")
-segments, info = model.transcribe("episode.mp3", language="en",
-                                  vad_filter=True,                   # skip silence and music
-                                  condition_on_previous_text=False)  # avoid repeated-line loops
-```
-
-Ctrl-C finishes the current episode, then stops. Rerun to continue.
-
-<!--
-device="mps" is the Apple silicon GPU; on other machines use "auto" (CUDA if available, else CPU).
-For the long run: nohup caffeinate -i python -u -m pipeline.s3_transcribe --whisper-only > log.txt &
-Whisper doesn't identify speakers, so speaker is null for those transcripts.
+s4_chunk, s5_index, search.py: from transcripts to a searchable vector database.
 -->
 
 ---
@@ -422,6 +489,29 @@ Shorter chunks get cut mid-thought more often, so they get a bit more overlap.
 
 ---
 
+## s4_chunk
+
+`python -m phase_0_command_line_search.s4_chunk --size 1000` → `chunks/1000/{slug}.json`
+
+```python
+def chunk_segments(segments, size, overlap):
+    """Return (first, last) segment index pairs."""
+    # add whole segments until the next one would pass `size` characters,
+    # then back up about `overlap` characters of whole segments and repeat
+```
+
+- About 30 lines of plain Python, no libraries
+- Runs in **seconds** for every podcast
+- `--size 500` for the small chunks; overlap defaults to 100 for 500 and 150 for 1000
+
+<!--
+chunk_transcript() turns each (first, last) pair into a chunk dict: text joined from the
+segments, start from the first segment, end from the last.
+Because it's so fast, try several sizes and compare them with real searches.
+-->
+
+---
+
 ## One chunk
 
 ```json
@@ -443,6 +533,25 @@ Shorter chunks get cut mid-thought more often, so they get a bit more overlap.
 <!--
 Stable IDs matter: the indexer checks "is this ID already in the database?" to skip finished episodes.
 The podcast name is in the ID because two shows could have an episode with the same slug.
+-->
+
+---
+
+## s5_index
+
+`python -m phase_0_command_line_search.s5_index --size 1000` → `data/chromadb/chunks_1000/`
+
+For each episode's chunks file:
+
+1. **Skip** it if its first chunk ID is already in the collection
+2. Look up the episode in `episodes.json` (title, date, `audio_url`)
+3. `collection.add(...)`: Chroma embeds the text and stores the vector, text, and metadata
+
+About **10 minutes** for 70,000 chunks on a laptop CPU. `--force` deletes the collection and rebuilds it.
+
+<!--
+The first run downloads the embedding model (~80 MB) to ~/.cache/chroma.
+Each chunk size gets its own folder, so data/chromadb/chunks_500/ and chunks_1000/ sit side by side.
 -->
 
 ---
@@ -474,7 +583,7 @@ which removes the model from your server entirely.
 ```python
 import chromadb
 
-client = chromadb.PersistentClient(path="data/chroma")
+client = chromadb.PersistentClient(path="data/chromadb/chunks_1000")
 collection = client.get_or_create_collection(
     "chunks_1000", configuration={"hnsw": {"space": "cosine"}})
 
@@ -505,6 +614,27 @@ Each chunk's metadata includes the episode's `title`, `podcast`, `published`, `a
 - Metadata also lets you **filter**: `where={"podcast": "practical-ai"}`
 
 Chroma metadata values must be simple: strings, numbers, booleans. No lists or dicts.
+
+---
+
+## search.py
+
+`python search.py "energy and water use of data centers"`
+
+| Option | Meaning |
+|---|---|
+| `-k 5` | how many results |
+| `--podcast practical-ai` | search one podcast |
+| `--slug ...` | search inside one episode |
+| `--size 500` | which chunk-size collection |
+| `--no-distinct` | allow several chunks from the same episode |
+| (no query) | interactive: keep asking questions |
+
+The `search()` function returns plain dicts (text, similarity, title, start, `play_url`, ...), so the Flask app can reuse it.
+
+<!--
+play_url is the mp3 URL plus #t=SECONDS, so a result can be played at the right moment.
+-->
 
 ---
 
@@ -634,17 +764,25 @@ segments on either side of the hit. That's also what you'll send to Gemini in th
 
 ---
 
-## Your team's next steps
+## Your team's assignment
 
-1. Get **text with timestamps** for 20+ episodes (feed transcripts, captions, or Whisper)
-2. Write the chunker; open the output and read a few chunks
-3. Load them into ChromaDB
-4. Build a **command-line search** before any web page
-5. Try two chunk sizes on 5 questions you write yourselves. Which wins, and why?
+1. Pick **2 to n podcasts**
+2. Get **text with timestamps** for **200+ episodes** (some via feed transcripts, some via Whisper)
+3. Write the chunker; open the output and read a few chunks. Pick **2 (or more)** chunk sizes.
+4. Load them into ChromaDB
+5. Build a **command-line search**
 
-Next: put this behind a Flask API with a podcast player.
+Then: try your chunk sizes on **5 questions you write yourselves**. Which wins, and why?
 
 <!--
-Step 4 is deliberate: a CLI search lets you judge retrieval quality without UI bugs in the way.
-Step 5 is the first taste of evaluation; Project 2 does it properly.
+Step 5 is deliberate: a CLI search lets you judge retrieval quality without UI bugs in the way.
+The 5 questions are the first taste of evaluation; Project 2 does it properly.
 -->
+
+---
+
+## The plan: we're doing Phase 1 next
+
+<img src="images/project1_phases_phase1.svg" width="900" alt="Phase 0 → Phase 1 → Phase 2 → Phase 3, with Phase 1 highlighted">
+
+Next: put this behind a Flask API with a podcast player.
