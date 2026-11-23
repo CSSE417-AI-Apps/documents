@@ -16,7 +16,7 @@ Quick links:
 |:---:|:---:|---|---|
 | **Week 1** | | | |
 | 1 | Monday<br>Nov 30 | • Course introduction<br>• Introduce Project 0: Git Workflow<br>• Introduce Project 1: Podcast Agent | • [Course intro slides](Slides/Day01_Course_Intro.md)<br>• **Assign:** [Project 0 instructions](Labs/Project_0_Git_Workflow.md)<br>• [Project 1 instructions](Labs/Project_1_Podcast_Agent.md) |
-| 2 | Tuesday<br>Dec 1 |  | • **Due:** [Claude Pro setup](Guides/Claude_Pro_Setup.md) |
+| 2 | Tuesday<br>Dec 1 | • Chunking and vector search | • [Chunking and vector search slides](Slides/Chunking_and_Vector_Search.md)<br>• **Due:** [Claude Pro setup](Guides/Claude_Pro_Setup.md) |
 | 3 | Thursday<br>Dec 3 |  | • **Due:** [Project 0: Git Workflow](Labs/Project_0_Git_Workflow.md) |
 | 4 | Friday<br>Dec 4<br>*Last day to add a class* |  | |
 | **Week 2** | | | |

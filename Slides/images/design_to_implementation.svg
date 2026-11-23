@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 340" width="1000" height="340" font-family="Helvetica, Arial, sans-serif">
+  <!-- above the line: what we just covered -->
+  <g transform="translate(140,95)">
+    <circle cx="0" cy="0" r="38" fill="#2BB673"/>
+    <path d="M-17,1 L-5,13 L18,-12" fill="none" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="210" y="110" font-size="50" font-weight="700" fill="#9CA3AF">High Level Design</text>
+
+  <!-- the line -->
+  <line x1="60" y1="170" x2="940" y2="170" stroke="#1F2937" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- below the line: where we're going -->
+  <g transform="translate(140,250)">
+    <circle cx="0" cy="0" r="38" fill="#E8572A"/>
+    <path d="M-14,-12 L-26,0 L-14,12 M14,-12 L26,0 L14,12 M6,-16 L-6,16" fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="210" y="267" font-size="50" font-weight="700" fill="#E8572A">Implementation Details</text>
+</svg>

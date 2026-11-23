@@ -11,7 +11,15 @@ Instructor-facing planning doc. It changes often, and students aren't expected t
 - Platform: GCP / Vertex AI / Gemini.
 - The implementation lives in a separate repo; this repo holds only the instructions.
 
-### Project 2: CSSE120_AI_TA (idea stage)
+### Project 2: CSSE120_AI_TA (draft instructions written Nov 11, 2026)
+- Student docs: [Project_2_CSSE120_AI_TA.md](Labs/Project_2_CSSE120_AI_TA.md), plus a [help policy template](Labs/Project_2_Help_Policy_Template.md), an [evaluation guide](Labs/Project_2_Evaluation_Guide.md), and a [pilot guide](Labs/Project_2_Pilot_Guide.md). Not yet linked from the calendar.
+- Tentative schedule: Weeks 6–10 (M1 Week 6 → M6 Week 10). This assumes Project 1 finishes by Week 5. Confirm before putting it on the calendar.
+- Dr. Fisher to-dos before launch:
+  - Collect the CSSE120 corpus (slides, readings, homework specs, solutions, unit tests) and put it in a **private** GCS bucket that the students' projects can read. Student repos are public, so solutions must never be committed.
+  - Choose the pilot homework, and make the buggy starting files for it.
+  - Recruit CSSE120 volunteers for the pilot (through the CSSE120 instructors). Check whether Rose-Hulman needs any approval for collecting chat logs and surveys from students in another course.
+  - Fill in the TODO links (bucket name, support resources, learning center).
+  - Build a quick reference prototype over break, to test the scope and the timing of each milestone.
 - Load in the course material from CSSE120 (lectures, homeworks, etc.).
 - Design and build an AI TA bot that CSSE120 students can use freely.
 - The bot limits how much it helps and uses sound learning techniques (hints, Socratic questions), so it doesn't hand out solutions.
@@ -53,7 +61,7 @@ Instructor-facing planning doc. It changes often, and students aren't expected t
 ### One-time org setup (Dr. Fisher)
 - Invite students by GitHub username, taken from the team sign-up spreadsheet on Moodle.
 - Org **Settings → Member privileges**: allow members to create **public** repositories; base permission **No permission**. Public repos are readable by everyone anyway, and this keeps any private instructor repo in the org hidden from students.
-- Instructor repos (`documents`, demos, starter code) have no ruleset; the PR rule is for student work. Solutions live outside the course org, in a private repo under Dr. Fisher's personal account.
+- Instructor repos (`documents`, demos, starter code) have no ruleset; the PR rule is for student work. Solutions live outside the course org, in one private repo under Dr. Fisher's personal account, with a folder per project.
 - Next year: repo names would collide with this year's. Use a new org, or add a term prefix to the naming pattern.
 
 ## Open decisions
