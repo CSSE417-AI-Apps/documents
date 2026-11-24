@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 600" width="1400" height="600" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="head" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#9CA3AF"/>
+    </marker>
+  </defs>
+
+  <!-- Row 1: the outer search (search page) -->
+  <text x="40" y="150" font-size="30" font-weight="bold" fill="#E8572A">Search page</text>
+  <text x="40" y="186" font-size="22" fill="#6B7280">outer search</text>
+
+  <!-- every chunk of every podcast -->
+  <g transform="translate(420,0)" fill="#9CA3AF">
+    <rect x="-75" y="60" width="26" height="26" rx="5"/><rect x="-43" y="60" width="26" height="26" rx="5"/><rect x="-11" y="60" width="26" height="26" rx="5" fill="#E8572A"/><rect x="21" y="60" width="26" height="26" rx="5"/><rect x="53" y="60" width="26" height="26" rx="5"/>
+    <rect x="-75" y="92" width="26" height="26" rx="5"/><rect x="-43" y="92" width="26" height="26" rx="5" fill="#E8572A"/><rect x="-11" y="92" width="26" height="26" rx="5"/><rect x="21" y="92" width="26" height="26" rx="5"/><rect x="53" y="92" width="26" height="26" rx="5" fill="#E8572A"/>
+    <rect x="-75" y="124" width="26" height="26" rx="5"/><rect x="-43" y="124" width="26" height="26" rx="5"/><rect x="-11" y="124" width="26" height="26" rx="5"/><rect x="21" y="124" width="26" height="26" rx="5" fill="#E8572A"/><rect x="53" y="124" width="26" height="26" rx="5"/>
+    <rect x="-75" y="156" width="26" height="26" rx="5" fill="#E8572A"/><rect x="-43" y="156" width="26" height="26" rx="5"/><rect x="-11" y="156" width="26" height="26" rx="5"/><rect x="21" y="156" width="26" height="26" rx="5"/><rect x="53" y="156" width="26" height="26" rx="5"/>
+  </g>
+  <text x="422" y="232" text-anchor="middle" font-size="26" font-weight="bold" fill="#1F2937">All chunks → top 80</text>
+
+  <line x1="530" y1="122" x2="640" y2="122" stroke="#9CA3AF" stroke-width="8" marker-end="url(#head)"/>
+
+  <!-- 8 episode cards -->
+  <g transform="translate(760,0)">
+    <rect x="-70" y="56" width="140" height="34" rx="8" fill="#FFFFFF" stroke="#1F2937" stroke-width="5"/>
+    <rect x="-62" y="63" width="20" height="20" rx="4" fill="#E8572A"/>
+    <rect x="-34" y="69" width="90" height="8" rx="4" fill="#9CA3AF"/>
+    <rect x="-70" y="104" width="140" height="34" rx="8" fill="#FFFFFF" stroke="#1F2937" stroke-width="5"/>
+    <rect x="-62" y="111" width="20" height="20" rx="4" fill="#4A90E2"/>
+    <rect x="-34" y="117" width="90" height="8" rx="4" fill="#9CA3AF"/>
+    <rect x="-70" y="152" width="140" height="34" rx="8" fill="#FFFFFF" stroke="#1F2937" stroke-width="5"/>
+    <rect x="-62" y="159" width="20" height="20" rx="4" fill="#E0A800"/>
+    <rect x="-34" y="165" width="90" height="8" rx="4" fill="#9CA3AF"/>
+  </g>
+  <text x="760" y="232" text-anchor="middle" font-size="26" font-weight="bold" fill="#1F2937">8 episodes</text>
+
+  <line x1="860" y1="122" x2="970" y2="122" stroke="#9CA3AF" stroke-width="8" marker-end="url(#head)"/>
+
+  <!-- the best line: a quote -->
+  <g transform="translate(1110,0)">
+    <rect x="-90" y="66" width="180" height="104" rx="14" fill="#2BB673"/>
+    <path d="M-60,100 q0,-18 18,-18 M-60,100 l0,22 l20,0 l0,-22 z M-20,100 q0,-18 18,-18 M-20,100 l0,22 l20,0 l0,-22 z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="4" stroke-linejoin="round"/>
+    <rect x="16" y="94" width="54" height="10" rx="5" fill="#FFFFFF"/>
+    <rect x="16" y="116" width="40" height="10" rx="5" fill="#FFFFFF"/>
+  </g>
+  <text x="1110" y="232" text-anchor="middle" font-size="26" font-weight="bold" fill="#1F2937">Best line per card</text>
+
+  <line x1="40" y1="300" x2="1360" y2="300" stroke="#E5E7EB" stroke-width="3"/>
+
+  <!-- Row 2: the inner search (episode page) -->
+  <text x="40" y="430" font-size="30" font-weight="bold" fill="#E8572A">Episode page</text>
+  <text x="40" y="466" font-size="22" fill="#6B7280">inner search</text>
+
+  <!-- one episode with moments -->
+  <g transform="translate(420,0)">
+    <rect x="-100" y="400" width="200" height="12" rx="6" fill="#9CA3AF"/>
+    <rect x="-78" y="384" width="10" height="44" rx="5" fill="#E8572A"/>
+    <rect x="-20" y="384" width="10" height="44" rx="5" fill="#E8572A"/>
+    <rect x="6" y="384" width="10" height="44" rx="5" fill="#E8572A"/>
+    <rect x="54" y="384" width="10" height="44" rx="5" fill="#E8572A"/>
+    <rect x="72" y="384" width="10" height="44" rx="5" fill="#E8572A"/>
+    <rect x="-52" y="384" width="10" height="44" rx="5" fill="#E8572A"/>
+  </g>
+  <text x="420" y="512" text-anchor="middle" font-size="26" font-weight="bold" fill="#1F2937">6 moments in 1 episode</text>
+
+  <line x1="540" y1="406" x2="650" y2="406" stroke="#9CA3AF" stroke-width="8" marker-end="url(#head)"/>
+
+  <!-- excerpts in time order -->
+  <g transform="translate(760,0)">
+    <rect x="-70" y="344" width="140" height="36" rx="8" fill="#FFF4EF" stroke="#E8572A" stroke-width="5"/>
+    <rect x="-70" y="390" width="140" height="56" rx="8" fill="#FFF4EF" stroke="#E8572A" stroke-width="5"/>
+    <rect x="-70" y="456" width="140" height="16" rx="6" fill="#FFF4EF" stroke="#E8572A" stroke-width="5"/>
+  </g>
+  <text x="760" y="512" text-anchor="middle" font-size="26" font-weight="bold" fill="#1F2937">Excerpts, in time order</text>
+
+  <line x1="860" y1="406" x2="1010" y2="406" stroke="#9CA3AF" stroke-width="8" marker-end="url(#head)"/>
+
+  <!-- Gemini -->
+  <g transform="translate(1110,406)">
+    <path d="M0,-62 C8,-14 14,-8 62,0 C14,8 8,14 0,62 C-8,14 -14,8 -62,0 C-14,-8 -8,-14 0,-62 Z" fill="#2BB673"/>
+  </g>
+  <text x="1110" y="512" text-anchor="middle" font-size="26" font-weight="bold" fill="#1F2937">Gemini</text>
+</svg>

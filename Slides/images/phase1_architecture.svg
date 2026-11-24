@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 460" width="1300" height="460" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="head" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#9CA3AF"/>
+    </marker>
+  </defs>
+
+  <!-- Web pages (static: public/) -->
+  <g transform="translate(170,0)">
+    <rect x="-80" y="150" width="160" height="124" rx="14" fill="#FFFFFF" stroke="#1F2937" stroke-width="8"/>
+    <line x1="-80" y1="182" x2="80" y2="182" stroke="#1F2937" stroke-width="8"/>
+    <circle cx="-58" cy="166" r="5" fill="#E8572A"/>
+    <circle cx="-42" cy="166" r="5" fill="#E0A800"/>
+    <circle cx="-26" cy="166" r="5" fill="#2BB673"/>
+    <rect x="-56" y="200" width="112" height="16" rx="8" fill="#9CA3AF"/>
+    <rect x="-56" y="228" width="70" height="10" rx="5" fill="#9CA3AF"/>
+    <rect x="-56" y="248" width="90" height="10" rx="5" fill="#9CA3AF"/>
+  </g>
+  <text x="170" y="320" text-anchor="middle" font-size="30" font-weight="bold" fill="#1F2937">Web pages</text>
+  <text x="170" y="354" text-anchor="middle" font-size="22" fill="#6B7280" font-family="Menlo, monospace">public/</text>
+
+  <line x1="275" y1="212" x2="465" y2="212" stroke="#9CA3AF" stroke-width="8" marker-start="url(#head)" marker-end="url(#head)"/>
+  <text x="370" y="196" text-anchor="middle" font-size="20" fill="#6B7280" font-family="Menlo, monospace">JSON</text>
+
+  <!-- Flask API -->
+  <g transform="translate(570,0)">
+    <rect x="-70" y="142" width="140" height="140" rx="24" fill="#4A90E2"/>
+    <path d="M-22,170 C-44,170 -30,206 -48,212 C-30,218 -44,254 -22,254" fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round"/>
+    <path d="M22,170 C44,170 30,206 48,212 C30,218 44,254 22,254" fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round"/>
+  </g>
+  <text x="570" y="320" text-anchor="middle" font-size="30" font-weight="bold" fill="#1F2937">Flask API</text>
+  <text x="570" y="354" text-anchor="middle" font-size="22" fill="#6B7280" font-family="Menlo, monospace">/api/*</text>
+
+  <line x1="670" y1="180" x2="880" y2="110" stroke="#9CA3AF" stroke-width="8" marker-start="url(#head)" marker-end="url(#head)"/>
+  <line x1="670" y1="244" x2="880" y2="314" stroke="#9CA3AF" stroke-width="8" marker-start="url(#head)" marker-end="url(#head)"/>
+
+  <!-- Vector DB + data -->
+  <g transform="translate(1000,0)">
+    <path d="M-62,44 L-62,126 A62,20 0 0 0 62,126 L62,44" fill="#E0A800"/>
+    <ellipse cx="0" cy="44" rx="62" ry="20" fill="#F2C94C"/>
+    <path d="M-62,72 A62,20 0 0 0 62,72 M-62,99 A62,20 0 0 0 62,99" fill="none" stroke="#FFFFFF" stroke-width="5"/>
+  </g>
+  <text x="1000" y="186" text-anchor="middle" font-size="30" font-weight="bold" fill="#1F2937">ChromaDB + data/</text>
+
+  <!-- Gemini -->
+  <g transform="translate(1000,316)">
+    <path d="M0,-62 C8,-14 14,-8 62,0 C14,8 8,14 0,62 C-8,14 -14,8 -62,0 C-14,-8 -8,-14 0,-62 Z" fill="#2BB673"/>
+  </g>
+  <text x="1000" y="420" text-anchor="middle" font-size="30" font-weight="bold" fill="#1F2937">Gemini</text>
+</svg>
