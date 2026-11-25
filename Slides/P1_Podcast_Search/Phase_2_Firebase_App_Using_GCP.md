@@ -325,7 +325,7 @@ Why bother: the public API function should never be able to unlink billing or re
 | `firebase-tools no longer supports Java version before 21` | emulators need Java 21+ | `brew install openjdk@21`, then the `sudo ln -sfn ...` line from brew's notes |
 | Functions venv is Python 3.14 | init uses your default `python3` | `runtime: python313` in `firebase.json`, rebuild the venv with 3.13 |
 | `firebase init` never returns | the hidden Agent Skills prompt | type `n`, Enter |
-| `Not in a Firebase app directory` | `firebase` looks for `firebase.json` | run it from `phase_2_firebase_app/` |
+| `Not in a Firebase app directory` | `firebase` looks for `firebase.json` | run it from `app/` |
 
 Python 3.13 is generally available for Cloud Functions until 2029; 3.14 was still "Preview" on some pages.
 
@@ -406,7 +406,7 @@ but only indexed ones are searchable or listed.
 
 ## How the data got there
 
-Every document in Firestore was written by one of three things. All run from `phase_2_firebase_app/`:
+Every document in Firestore was written by one of three things. All run from `app/`:
 
 | Command | Writes | When |
 |---|---|---|
@@ -631,7 +631,7 @@ Cost: **$0.016** (52k tokens, run twice).
 <!--
 The API's `title` field goes in the request's settings, so it applies to every text in that request:
 C and D need one request per episode instead of 50 texts per request. There is no `description` field.
-Script: phase_2_firebase_app/experiments/title_test.py (reads the chunk vectors back from Firestore: free reads).
+Script: app/experiments/title_test.py (reads the chunk vectors back from Firestore: free reads).
 -->
 
 ---
@@ -690,7 +690,7 @@ Firebase Hosting gives up after 60 s anyway.
 
 ## What changed in `app.py`
 
-Diff `phase_1_local_flask_app/app.py` against `phase_2_firebase_app/functions/app.py`:
+Diff `phase_1_local_flask_app/app.py` against `app/functions/app.py`:
 
 | Phase 1 | Phase 2 | Why |
 |---|---|---|
@@ -765,6 +765,23 @@ firebase emulators:start --import=./emulator-data --export-on-exit
 **Emulated** (free): Hosting, Functions, Firestore.
 **Real** (costs money): Vertex AI embeddings, Gemini. The emulator warns you:
 *"Non-emulated services will access production using these credentials. Be careful!"*
+
+---
+
+## The Emulator UI: http://localhost:4000
+
+<img src="../images/phase2_emulator_ui.png" width="820" alt="Firebase Emulator Suite overview: Firestore on 8085, Functions on 5001, Auth, Storage and Pub/Sub off">
+
+- **Overview:** which emulators are on (we use Firestore, Functions and Hosting), and their ports
+- **Firestore tab:** the same collections as the real console (`podcasts`, `chunks`, `prompts`, ...), but
+  **local and in memory**. Edit a prompt here and reload `localhost:5002`.
+- **Logs tab:** every `print()` and error from the function, the first place to look when the page says *Internal Server Error*
+
+<!--
+"Off" emulators (Auth, Storage, Pub/Sub) are services we didn't set up in firebase.json.
+The banner is the important reminder: this is local, but Vertex AI and Gemini calls are real.
+The Extensions emulator shows "On" because it shares the Functions emulator's port; we don't use it.
+-->
 
 ---
 
