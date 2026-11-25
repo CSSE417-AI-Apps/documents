@@ -8,7 +8,7 @@ paginate: true
 # Phase 1: Local Web App with Generative Text
 ### Search Page → Episode Page → Moments → Prompt → Chat
 
-<img src="images/phase1_architecture.svg" width="760" alt="Web pages ⇄ Flask API ⇄ ChromaDB + data, and Gemini">
+<img src="../images/phase1_architecture.svg" width="760" alt="Web pages ⇄ Flask API ⇄ ChromaDB + data, and Gemini">
 
 CSSE 417 · Project 1: Podcast Agent
 
@@ -21,7 +21,7 @@ from the working solution, in the order we built it, so the numbers and screensh
 
 ## The plan: we're doing Phase 1
 
-<img src="images/project1_phases_phase1.svg" width="900" alt="Phase 0 → Phase 1 → Phase 2 → Phase 3, with Phase 1 highlighted">
+<img src="../images/project1_phases_phase1.svg" width="900" alt="Phase 0 → Phase 1 → Phase 2 → Phase 3, with Phase 1 highlighted">
 
 - **Phase 0:** Vector Database to Command Line Search
 - **Phase 1:** Local Web App with Generative Text
@@ -37,7 +37,7 @@ the web app around it and one new ingredient: a language model.
 
 ## The goal: two pages
 
-<img src="images/phase1_search_home.png" width="420" alt="The search page before a search"> <img src="images/phase1_episode_page.png" width="560" alt="The episode page: player and transcript on the left, chat on the right">
+<img src="../images/phase1_search_home.png" width="420" alt="The search page before a search"> <img src="../images/phase1_episode_page.png" width="560" alt="The episode page: player and transcript on the left, chat on the right">
 
 - **Search page:** type a topic or question, get episodes **and the moment** it comes up
 - **Episode page:** player + transcript on the left, an AI conversation on the right
@@ -94,11 +94,11 @@ podcast transcripts, but don't type anything private into your app.
 
 ## Architecture: static pages + a JSON API
 
-<img src="images/phase1_architecture.svg" width="760" alt="Web pages ⇄ Flask API ⇄ ChromaDB + data, and Gemini">
+<img src="../images/phase1_architecture.svg" width="760" alt="Web pages ⇄ Flask API ⇄ ChromaDB + data, and Gemini">
 
 - `public/`: plain HTML, CSS and JavaScript. **No server-side templates.**
 - Flask only answers `/api/*` with JSON
-- Phase 2: `public/` goes to **Firebase Hosting**, `/api/*` goes to **Cloud Run**, nothing else changes
+- Phase 2: `public/` goes to **Firebase Hosting**, `/api/*` goes to a **Cloud Function**, and the pages don't change
 
 <!--
 Templates (Jinja) would be simpler for one more week and harder forever after:
@@ -132,7 +132,7 @@ Bind to 127.0.0.1, not 0.0.0.0: anyone who can reach the server can spend your G
 
 ## The search page
 
-<img src="images/phase1_search_results.png" width="760" alt="Search results: episode cards with a quoted line and timestamp">
+<img src="../images/phase1_search_results.png" width="760" alt="Search results: episode cards with a quoted line and timestamp">
 
 <!--
 Each card: show art, show · date · length, title, the first ~250 characters of the description
@@ -223,7 +223,7 @@ their own sources (or not).
 
 ## Leave a podcast out
 
-<img src="images/phase1_search_home.png" width="520" alt="Show covers on the home page work as toggles">
+<img src="../images/phase1_search_home.png" width="520" alt="Show covers on the home page work as toggles">
 
 Click a cover to leave that show out. Where should the filter run?
 
@@ -256,7 +256,7 @@ is also remembered in localStorage for your next visit.
 
 ## The episode page
 
-<img src="images/phase1_episode_page.png" width="980" alt="Player, moments strip and transcript on the left; chat on the right">
+<img src="../images/phase1_episode_page.png" width="980" alt="Player, moments strip and transcript on the left; chat on the right">
 
 <!--
 Left: art, title, description, the browser's own audio player, the moments strip, the transcript.
@@ -283,7 +283,7 @@ This is the same pattern as the Genesis Melodies site.
 
 ## Two searches
 
-<img src="images/phase1_two_searches.svg" width="900" alt="Search page: all chunks → 8 episodes → best line. Episode page: 6 moments in 1 episode → excerpts → Gemini">
+<img src="../images/phase1_two_searches.svg" width="900" alt="Search page: all chunks → 8 episodes → best line. Episode page: 6 moments in 1 episode → excerpts → Gemini">
 
 The episode page **searches again**, only inside this episode (`where={"slug": ...}`).
 
@@ -296,7 +296,7 @@ The outer search picks episodes. The inner search picks moments. They can disagr
 
 ## Moments: where the question comes up
 
-<img src="images/phase1_episode_page.png" width="620" alt="The moments strip: ticks under the player">
+<img src="../images/phase1_episode_page.png" width="620" alt="The moments strip: ticks under the player">
 
 - The inner search's 6 best chunks → **ticks** under the player, **highlighted** lines in the transcript
 - `‹ Moment 3 of 6 ›` steps through them
@@ -522,7 +522,7 @@ Phase 0; 3-5 are the new AI parts.
 
 ## The plan: we're doing Phase 2 next
 
-<img src="images/project1_phases_phase2.svg" width="900" alt="Phase 0 → Phase 1 → Phase 2 → Phase 3, with Phase 2 highlighted">
+<img src="../images/project1_phases_phase2.svg" width="900" alt="Phase 0 → Phase 1 → Phase 2 → Phase 3, with Phase 2 highlighted">
 
-Next: the same app on Google Cloud: Firebase Hosting for `public/`, Cloud Run for `/api/*`,
+Next: the same app on Google Cloud: Firebase Hosting for `public/`, a Cloud Function for `/api/*`, Firestore vector search,
 Vertex AI embeddings and Gemini.

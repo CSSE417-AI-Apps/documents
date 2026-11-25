@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -60 1300 360" width="1300" height="360" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="head" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#9CA3AF"/>
+    </marker>
+  </defs>
+
+  <!-- data/ folder -->
+  <g transform="translate(150,150)">
+    <path d="M-72,-46 L-22,-46 L-8,-30 L72,-30 L72,52 L-72,52 Z" fill="#E0A800"/>
+    <rect x="-72" y="-18" width="144" height="70" rx="6" fill="#F2C94C"/>
+  </g>
+  <text x="150" y="255" text-anchor="middle" font-size="30" font-weight="bold" fill="#1F2937" font-family="Menlo, monospace">data/</text>
+  <text x="150" y="287" text-anchor="middle" font-size="22" fill="#6B7280">Phase 0, on your Mac</text>
+
+  <line x1="235" y1="150" x2="385" y2="150" stroke="#9CA3AF" stroke-width="8" marker-end="url(#head)"/>
+
+  <!-- backfill.py (terminal) -->
+  <g transform="translate(480,150)">
+    <rect x="-72" y="-62" width="144" height="124" rx="18" fill="#1F2937"/>
+    <path d="M-44,-20 L-14,4 L-44,28" fill="none" stroke="#2BB673" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="2" y1="30" x2="42" y2="30" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round"/>
+  </g>
+  <text x="480" y="255" text-anchor="middle" font-size="30" font-weight="bold" fill="#1F2937" font-family="Menlo, monospace">backfill.py</text>
+  <text x="480" y="287" text-anchor="middle" font-size="22" fill="#6B7280">skips finished episodes</text>
+
+  <line x1="565" y1="150" x2="715" y2="150" stroke="#9CA3AF" stroke-width="8" marker-start="url(#head)" marker-end="url(#head)"/>
+  <text x="640" y="128" text-anchor="middle" font-size="19" fill="#6B7280">chunk text</text>
+  <text x="640" y="186" text-anchor="middle" font-size="19" fill="#6B7280">vectors</text>
+
+  <!-- Vertex AI -->
+  <g transform="translate(810,150)">
+    <path d="M0,-62 L54,-31 L54,31 L0,62 L-54,31 L-54,-31 Z" fill="#1F2937"/>
+    <line x1="0" y1="-28" x2="-26" y2="17" stroke="#FFFFFF" stroke-width="5"/>
+    <line x1="0" y1="-28" x2="26" y2="17" stroke="#FFFFFF" stroke-width="5"/>
+    <line x1="-26" y1="17" x2="26" y2="17" stroke="#FFFFFF" stroke-width="5"/>
+    <circle cx="0" cy="-28" r="11" fill="#E0A800"/>
+    <circle cx="-26" cy="17" r="11" fill="#FFFFFF"/>
+    <circle cx="26" cy="17" r="11" fill="#FFFFFF"/>
+  </g>
+  <text x="810" y="255" text-anchor="middle" font-size="30" font-weight="bold" fill="#1F2937">Vertex AI</text>
+  <text x="810" y="287" text-anchor="middle" font-size="22" fill="#6B7280">768 numbers per chunk</text>
+
+  <!-- arc from backfill over Vertex to Firestore -->
+  <path d="M480,78 C480,-40 1140,-40 1140,80" fill="none" stroke="#9CA3AF" stroke-width="8" marker-end="url(#head)"/>
+  <text x="810" y="30" text-anchor="middle" font-size="19" fill="#6B7280">transcript + chunks + vectors</text>
+
+  <!-- Firestore -->
+  <g transform="translate(1140,65)">
+    <path d="M-62,44 L-62,126 A62,20 0 0 0 62,126 L62,44" fill="#E0A800"/>
+    <ellipse cx="0" cy="44" rx="62" ry="20" fill="#F2C94C"/>
+    <path d="M-62,72 A62,20 0 0 0 62,72 M-62,99 A62,20 0 0 0 62,99" fill="none" stroke="#FFFFFF" stroke-width="5"/>
+  </g>
+  <text x="1140" y="255" text-anchor="middle" font-size="30" font-weight="bold" fill="#1F2937">Firestore</text>
+  <text x="1140" y="287" text-anchor="middle" font-size="22" fill="#6B7280">one batch per episode</text>
+</svg>

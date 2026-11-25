@@ -8,7 +8,7 @@ paginate: true
 # Phase 0: Command Line Podcast Search
 ### Discovery → Audio/VTT Download → Transcripts → Chunks → Embeddings → Vector Search
 
-<img src="images/phase0_logo.svg" width="560" alt="Podcasts → Vector Database → Search">
+<img src="../images/phase0_logo.svg" width="560" alt="Podcasts → Vector Database → Search">
 
 CSSE 417 · Project 1: Podcast Agent
 
@@ -22,7 +22,7 @@ solution, so the numbers are real.
 
 ## The plan: we're doing Phase 0
 
-<img src="images/project1_phases.svg" width="900" alt="Phase 0 → Phase 1 → Phase 2 → Phase 3, with Phase 0 highlighted">
+<img src="../images/project1_phases.svg" width="900" alt="Phase 0 → Phase 1 → Phase 2 → Phase 3, with Phase 0 highlighted">
 
 - **Phase 0:** Vector Database to Command Line Search
 - **Phase 1:** Local Web App with Generative Text
@@ -38,7 +38,7 @@ a nicer UI, Gemini, or the cloud won't fix it. That's why we start here.
 
 ## Details of Phase 0
 
-<img src="images/phase0_stages.svg" width="1000" alt="Discovery → Audio/VTT Download → Transcripts → Chunks → Embeddings → Vector Search">
+<img src="../images/phase0_stages.svg" width="1000" alt="Discovery → Audio/VTT Download → Transcripts → Chunks → Embeddings → Vector Search">
 
 - **Discovery:** read the podcast's RSS feed: every episode, its mp3, maybe a transcript
 - **Audio/VTT Download:** the feed's transcript (VTT) if it has one, otherwise the mp3
@@ -84,7 +84,7 @@ The real CLI output also prints the passage text and that same link.
 
 ## 1. Discovery
 
-<img src="images/phase0_stage1_discovery.svg" width="760" alt="Phase 0 stages with Discovery highlighted">
+<img src="../images/phase0_stage1_discovery.svg" width="760" alt="Phase 0 stages with Discovery highlighted">
 
 Every podcast publishes a free **RSS feed**: one XML file listing every episode and its mp3.
 We turn each feed into a clean `episodes.json`.
@@ -107,7 +107,7 @@ We'll keep adding lines to this data layout as we go through the stages.
 
 ## 2. Audio/VTT Download
 
-<img src="images/phase0_stage2_download.svg" width="760" alt="Phase 0 stages with Audio/VTT Download highlighted">
+<img src="../images/phase0_stage2_download.svg" width="760" alt="Phase 0 stages with Audio/VTT Download highlighted">
 
 | Podcast | Download the VTT | Download the mp3 |
 |---|---|---|
@@ -132,7 +132,7 @@ so only the ~120 newer episodes needed audio downloads.
 
 ## 3. Transcripts: the slow step
 
-<img src="images/phase0_stage3_transcripts.svg" width="760" alt="Phase 0 stages with Transcripts highlighted">
+<img src="../images/phase0_stage3_transcripts.svg" width="760" alt="Phase 0 stages with Transcripts highlighted">
 
 - **Feed transcript?** Convert it: seconds per episode
 - **Only audio?** Run **Whisper**, OpenAI's open speech-to-text model, on your own machine
@@ -153,7 +153,7 @@ Everything after this step takes minutes, which is why it's its own stage.
 
 ## 4. Chunks
 
-<img src="images/phase0_stage4_chunks.svg" width="760" alt="Phase 0 stages with Chunks highlighted">
+<img src="../images/phase0_stage4_chunks.svg" width="760" alt="Phase 0 stages with Chunks highlighted">
 
 Cut each transcript into short pieces, so search can find **the moment**, not just the episode.
 
@@ -175,7 +175,7 @@ We'll come back to 500 vs 1000 with real search results later in the deck.
 
 ## 5. Embeddings
 
-<img src="images/phase0_stage5_embeddings.svg" width="760" alt="Phase 0 stages with Embeddings highlighted">
+<img src="../images/phase0_stage5_embeddings.svg" width="760" alt="Phase 0 stages with Embeddings highlighted">
 
 - An embedding model turns each chunk into a **vector**: 384 numbers that capture its meaning
 - Model: `all-MiniLM-L6-v2`, small and free, runs on your laptop's CPU
@@ -195,7 +195,7 @@ In phase 2 we'll switch to Vertex AI embeddings in Google Cloud.
 
 ## 6. Vector Search
 
-<img src="images/phase0_stage6_search.svg" width="760" alt="Phase 0 stages with Vector Search highlighted">
+<img src="../images/phase0_stage6_search.svg" width="760" alt="Phase 0 stages with Vector Search highlighted">
 
 1. Embed the **question** with the same model
 2. Find the chunk vectors pointing in the most similar direction: **cosine similarity**
@@ -239,7 +239,7 @@ Ask Claude Code for this structure up front.
 
 ## Now we transition from
 
-<img src="images/design_to_implementation.svg" width="760" alt="High Level Design (done) above a line, Implementation Details below it">
+<img src="../images/design_to_implementation.svg" width="760" alt="High Level Design (done) above a line, Implementation Details below it">
 
 <!--
 Everything so far was the map. From here on, we open each stage's script.
@@ -294,7 +294,7 @@ s4 and s5 are in phase_0_command_line_search/. search.py is at the top, shared w
 
 ## Part 1: Getting the data
 
-<img src="images/phase0_part1_data.svg" width="1000" alt="Phase 0 stages with Discovery, Audio/VTT Download, and Transcripts highlighted">
+<img src="../images/phase0_part1_data.svg" width="1000" alt="Phase 0 stages with Discovery, Audio/VTT Download, and Transcripts highlighted">
 
 <!--
 s1_discover, s2_download, s3_transcribe: from an RSS feed to timed transcripts.
@@ -331,7 +331,7 @@ To find a podcast's feed URL, search Apple's iTunes Search API by name.
 
 ## Two ways to get a transcript: overview
 
-<img src="images/two_ways_to_transcript.svg" width="900" alt="raw_transcripts/{slug}.vtt or .srt (convert, seconds) and audio/{slug}.mp3 (Whisper, minutes) both become transcripts/{slug}.json">
+<img src="../images/two_ways_to_transcript.svg" width="900" alt="raw_transcripts/{slug}.vtt or .srt (convert, seconds) and audio/{slug}.mp3 (Whisper, minutes) both become transcripts/{slug}.json">
 
 s3 turns both paths into **one** format, so every later stage sees the same JSON.
 
@@ -443,7 +443,7 @@ but you can't jump the player to the right moment. That's a real tradeoff for yo
 
 ## Part 2: Vectorizing the data
 
-<img src="images/phase0_part2_vectors.svg" width="1000" alt="Phase 0 stages with Chunks, Embeddings, and Vector Search highlighted">
+<img src="../images/phase0_part2_vectors.svg" width="1000" alt="Phase 0 stages with Chunks, Embeddings, and Vector Search highlighted">
 
 <!--
 s4_chunk, s5_index, search.py: from transcripts to a searchable vector database.
@@ -800,6 +800,6 @@ The 5 questions are the first taste of evaluation; Project 2 does it properly.
 
 ## The plan: we're doing Phase 1 next
 
-<img src="images/project1_phases_phase1.svg" width="900" alt="Phase 0 → Phase 1 → Phase 2 → Phase 3, with Phase 1 highlighted">
+<img src="../images/project1_phases_phase1.svg" width="900" alt="Phase 0 → Phase 1 → Phase 2 → Phase 3, with Phase 1 highlighted">
 
 Next: put this behind a Flask API with a podcast player.

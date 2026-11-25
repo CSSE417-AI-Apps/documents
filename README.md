@@ -16,12 +16,12 @@ Quick links:
 |:---:|:---:|---|---|
 | **Week 1** | | | |
 | 1 | Monday<br>Nov 30 | • Course introduction<br>• Introduce Project 0: Git Workflow<br>• Introduce Project 1: Podcast Agent | • [Course intro slides](Slides/Day01_Course_Intro.md)<br>• **Assign:** [Project 0 instructions](Labs/Project_0_Git_Workflow.md)<br>• [Project 1 instructions](Labs/Project_1_Podcast_Agent.md) |
-| 2 | Tuesday<br>Dec 1 | • Chunking and vector search | • [Chunking and vector search slides](Slides/Chunking_and_Vector_Search.md)<br>• **Due:** [Claude Pro setup](Guides/Claude_Pro_Setup.md) |
+| 2 | Tuesday<br>Dec 1 | • Chunking and vector search | • [Chunking and vector search slides](Slides/P1_Podcast_Search/Phase_0_Chunking_and_Vector_Search.md)<br>• **Due:** [Claude Pro setup](Guides/Claude_Pro_Setup.md) |
 | 3 | Thursday<br>Dec 3 |  | • **Due:** [Project 0: Git Workflow](Labs/Project_0_Git_Workflow.md) |
-| 4 | Friday<br>Dec 4<br>*Last day to add a class* |  | |
+| 4 | Friday<br>Dec 4<br>*Last day to add a class* | • Flask app and generative text | • [Flask app and generative text slides](Slides/P1_Podcast_Search/Phase_1_Flask_App_and_Generative_Text.md) |
 | **Week 2** | | | |
 | 5 | Monday<br>Dec 7 |  | |
-| 6 | Tuesday<br>Dec 8 |  | |
+| 6 | Tuesday<br>Dec 8 | • Firebase app using Google Cloud | • [Firebase app using GCP slides](Slides/P1_Podcast_Search/Phase_2_Firebase_App_Using_GCP.md) |
 | 7 | Thursday<br>Dec 10 |  | |
 | 8 | Friday<br>Dec 11 |  | |
 | **Week 3** | | | |

@@ -7,7 +7,8 @@ Decks are Marp-flavored Markdown. Students present them in VS Code (Marp extensi
 - Put speaker notes and Marp directives (e.g. `<!-- _class: lead -->`) in HTML comments. GitHub hides them.
 - **Don't** use Marp background-image syntax (`![bg ...]`) or image sizing like `![w:300]`. GitHub shows those as full-size inline images. Use `<img src="..." width="...">` instead.
 - Don't use custom themes or `<style>` blocks.
-- File naming: `DayNN_Short_Topic.md`, where NN is the calendar's Day number. Images go in `Slides/images/`.
+- File naming: one-off lectures are `DayNN_Short_Topic.md` (NN = the calendar's Day number). Project decks live in a folder per project, one deck per phase: `P1_Podcast_Search/Phase_0_Chunking_and_Vector_Search.md`, `Phase_1_…`, `Phase_2_Firebase_App_Using_GCP.md`.
+- Images go in `Slides/images/` for every deck. Decks inside a project folder reference them as `../images/name.svg`.
 - Link each deck from its row in the root `README.md` calendar.
 
 ## Images
