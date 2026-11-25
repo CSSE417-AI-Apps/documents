@@ -37,21 +37,21 @@ Part B moves the data and the search into the cloud.
 
 | Phase 1 (your laptop) | Phase 2 (Google Cloud) |
 |---|---|
-| `public/` served by Flask | `public/` on **Firebase Hosting** (unchanged files) |
-| `python app.py` | a **Cloud Function** running the same Flask routes |
-| ChromaDB folder on disk | **Firestore** documents + vector search |
-| MiniLM inside Chroma | **Vertex AI** embeddings (`gemini-embedding-001`) |
+| `public/` served by Flask | `public/` on **Firebase Hosting** (unchanged) |
+| `python app.py` | **Cloud Function** running the same Flask routes |
+| `data/` files: episodes, transcripts, chunks | **Firestore** documents |
+| ChromaDB + MiniLM | Firestore **vector search** + **Vertex AI** embeddings |
 | `GEMINI_API_KEY` in `.env` | **Secret Manager** |
-| summary cache folder | a Firestore collection |
 | free | **real money**: so we start with cost safety |
 
 End result: `https://search-podcast-transcripts.web.app`
 
 ---
 
-## A hack costs twice
+## We COULD quickly get our Flask app online, but...
 
-The quickest deploy: copy the 880 MB ChromaDB folder and the MiniLM model into a container.
+The quickest deploy, copying the 880 MB ChromaDB folder and the MiniLM model into a container,
+would actually **cost us time**: none of it is useful for Phase 3, the final phase. A hack costs twice.
 
 | | Quick hack | The eventual way |
 |---|---|---|
@@ -130,17 +130,53 @@ We need Blaze. Blaze keeps the free tiers; it just stops refusing when you go ov
 
 ## My $1,832 mistake
 
-- **Dec 27, 2024:** I start Google's own tutorial notebook, [hybrid search with Vertex AI](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/embeddings/hybrid-search.ipynb), to prepare a class. It crashes partway through. I plan to finish it later.
+- **Dec 27, 2024:** I started Google's own tutorial notebook, [hybrid search with Vertex AI](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/embeddings/hybrid-search.ipynb), to prepare a class. It crashed partway through. I planned to finish it later.
 - Partway was far enough: it had already **deployed a Vector Search index endpoint** (an `e2-standard-16` machine).
-- **Mar 13, 2025:** I finish the notebook. Its last cell:
+- **Mar 13, 2025:** I finished the notebook. Its last cell:
   > *"please make sure to delete all the Indexes, Index Endpoints and Cloud Storage buckets after finishing this tutorial. Otherwise the remaining objects would incur unexpected costs."*
-- I check. **3,429 hours** of "Vector Search Index Serving" for an index **nobody ever queried**: $2,574 at list price. My credits covered $839; **my personal card paid the rest, month after month. Final total: $1,832.**
+- I checked. **3,429 hours** of "Vector Search Index Serving" for an index **nobody ever queried**: $2,574 at list price. My credits covered $839; **my personal card paid the rest, month after month. Final total: $1,832.**
 
 <!--
 January $276, February $1,009, March 1-13 $461. I was paying the monthly bills without
 reading them closely. Filed a support case on 3/13/25. After a month of emails, Google refunded
 the full $1,832 on 4/19/25, which I appreciated very much. It was a month of real stress.
 -->
+
+---
+
+## Vector Search endpoints vs Cloud Functions
+
+| | Service | What it is, and how it bills |
+|---|---|---|
+| ![w:110](../images/billing_vector_search_endpoint.svg) | **Vertex AI Vector Search endpoint**<br>*by the hour, used or not* | A machine kept running to answer vector queries fast. Bills every hour it exists, queried or not. |
+| ![w:110](../images/billing_cloud_function.svg) | **Cloud Functions that scale to zero**<br>*by the use* | Your code runs only when a request arrives. No requests: no instances, no charge. |
+
+---
+
+## VMs vs Firestore
+
+| | Service | What it is, and how it bills |
+|---|---|---|
+| ![w:110](../images/billing_vm.svg) | **VMs (Compute Engine)**<br>*by the hour, used or not* | A virtual computer you rent. It bills every hour it is switched on, even sitting idle. |
+| ![w:110](../images/billing_firestore.svg) | **Firestore reads, writes, storage**<br>*by the use* | A document database billed per read, per write and per gigabyte stored. Idle data costs pennies. |
+
+---
+
+## Cloud SQL / AlloyDB vs embedding calls
+
+| | Service | What it is, and how it bills |
+|---|---|---|
+| ![w:110](../images/billing_cloud_sql.svg) | **Cloud SQL / AlloyDB instances**<br>*by the hour, used or not* | Managed PostgreSQL or MySQL servers. The instance bills every hour, even with zero queries. |
+| ![w:110](../images/billing_embedding_call.svg) | **Vertex AI embedding calls**<br>*by the use* | Send text, get vectors back. Billed per token sent; nothing at all between calls. |
+
+---
+
+## Warm functions vs Gemini calls
+
+| | Service | What it is, and how it bills |
+|---|---|---|
+| ![w:110](../images/billing_warm_function.svg) | **Functions with `min_instances > 0`**<br>*by the hour, used or not* | Keeps copies of your function running to skip cold starts. You pay for them all day. |
+| ![w:110](../images/billing_gemini_call.svg) | **Gemini calls**<br>*by the use* | Send a prompt, get text back. Billed per input and output token, per call. |
 
 ---
 
@@ -335,12 +371,90 @@ Firestore limits that matter: vectors up to **2048** numbers, `find_nearest` ret
 
 ---
 
+## Where the data lives: files become documents
+
+| Phase 0/1: files on your Mac | Phase 2: Firestore documents |
+|---|---|
+| `data/{p}/show.json` | `podcasts/{p}` |
+| `data/{p}/episodes.json` (one list per show) | `podcasts/{p}/episodes/{slug}` (one per episode) |
+| `data/{p}/transcripts/{slug}.json` | `podcasts/{p}/transcripts/{slug}` |
+| `data/{p}/chunks/1000/{slug}.json` + the ChromaDB folder | `chunks/{p}__{slug}__000`, `__001`, ... |
+| `data/cache/summaries/.../*.json` | `summaries/{hash}` |
+
+- **Same contents, new home.** `backfill.py` copies each file into its documents.
+- **Vectors move in with the data:** ChromaDB kept them in its own folder; now each chunk
+  document holds its 768 numbers
+- New only in the cloud: `indexed` and `chunk_count` on an episode (the backfill's "done" marks)
+
+---
+
+## What it looks like in the console
+
+<img src="../images/phase2_firestore_console.png" width="1000" alt="Firestore console: podcasts > bibleproject > episodes > one episode document with its fields">
+
+`podcasts` → `bibleproject` (show fields) → its `episodes` and `transcripts` subcollections → one
+episode document: `audio_url`, `description`, `duration_s`, `published`, `title`, ...
+
+<!--
+Console: Firebase console > Firestore Database > Data. Three columns: collection, document, fields.
+This episode has no transcript yet; an indexed one also shows indexed, chunk_count and embed_model.
+Episodes without a transcript are there too (titles for the "nearby episodes" in the prompt),
+but only indexed ones are searchable or listed.
+-->
+
+---
+
+## How the data got there
+
+Every document in Firestore was written by one of three things. All run from `phase_2_firebase_app/`:
+
+| Command | Writes | When |
+|---|---|---|
+| `python backfill.py --cloud --limit 3` | `podcasts`, `episodes`, `transcripts`, `chunks` (+ Vertex embeddings) | once, then for new episodes |
+| `python set_prompts.py --cloud` | `prompts/system`, `prompts/user` | once; then edit in the console |
+| the app itself | `summaries` (each new Gemini summary) | while people use the site |
+
+Before those, two setup steps made the empty database ready:
+
+- **Firebase console:** create the Firestore database (Standard edition, `nam5`)
+- `firebase deploy --only firestore:rules,firestore:indexes`: lock it down, create the vector indexes
+
+<!--
+backfill.py reads Phase 0's data/ folder (show.json, episodes.json, transcripts/, chunks/1000/) and
+embeds every chunk with Vertex AI, then writes one batch per episode. It asks before spending money.
+Swap --cloud for --emulator to fill the local emulator instead (same code, same documents).
+In Phase 3 the pipeline takes over backfill.py's job: new episodes arrive without anyone running it.
+-->
+
+---
+
+## Chunks find, lines display
+
+The episode page's transcript comes from **every transcript line**, not from chunks:
+
+1. `GET /api/episode/<p>/<slug>` returns the episode and all its lines `{start, end, text, speaker}`
+   (Phase 1: `transcripts/{slug}.json`; Phase 2: the `transcripts/{slug}` document)
+2. The browser groups lines into paragraphs (new speaker, or every 30 s) with a clickable timestamp
+3. **Highlights:** the URL's `t..e` (the card's best line), plus `GET /api/moments` = the 6 best
+   **chunks** in this episode, shown as ticks and highlighted lines
+4. **Follow-along:** while playing, find the line at the current time and highlight it
+
+Chunks are for **finding** (vector search). Lines are for **showing** (timestamps). Same in both phases.
+
+<!--
+Each line is its own <span>, so it can be highlighted and clicked. A chunk knows which lines it
+covers (segment_first..segment_last), which is how a chunk hit becomes highlighted lines.
+The page code (public/) is identical in Phase 1 and Phase 2; only where the API reads from changed.
+-->
+
+---
+
 ## The Firestore data model
 
 ```
 podcasts/{podcast}                     show: title, image, order, episodes (searchable count)
 podcasts/{podcast}/episodes/{slug}     title, published, audio_url, image, ... + indexed, chunk_count
-podcasts/{podcast}/transcripts/{slug}  {segments: [{start, end, text, speaker?}]}
+podcasts/{podcast}/transcripts/{slug}  {segments: [{start, end, text, speaker?}]}  (header lines first)
 chunks/{podcast}__{slug}__017          podcast, slug, index, start, end, text,
                                        lines (its transcript lines), embedding (768 numbers)
 summaries/{hash}                       cached Gemini summaries
@@ -390,6 +504,24 @@ Vertex embeddings need no API key: the client signs in with Application Default 
 
 ---
 
+## Bigger chunks now? We could, but we won't
+
+| | MiniLM (Phase 0/1) | `gemini-embedding-001` |
+|---|---|---|
+| Reads at most | 256 tokens ≈ **1,000 characters** | 2,048 tokens ≈ **8,000 characters** |
+
+The model's limit was never the real reason for 1,000. **Focus** was:
+
+- A 2,000-character chunk is two minutes of talk: often **two topics in one vector**
+- Moments get coarser, and every Gemini prompt (moments ± neighbors) doubles in size
+- The embedding cost would be the same (same text, half as many chunks)
+- And we'd change **two things at once** (model and size): compare Phase 1 with Phase 2 and you
+  couldn't tell which one made the difference
+
+**No code change: 1000 stays.** A good experiment for your team after the full backfill.
+
+---
+
 ## Two kinds of embeddings, one shared file
 
 ```python
@@ -429,7 +561,8 @@ Each filter combination needs a **vector index**, declared in `firestore.indexes
               {"fieldPath": "embedding", "vectorConfig": {"dimension": 768, "flat": {}}} ] }
 ```
 
-We have two: `(podcast)` for the search page, `(podcast, slug)` for moments inside one episode.
+Vector indexes: chunks by `(podcast)` for the search page, chunks by `(podcast, slug)` for moments,
+plus one ordinary index, episodes by `(indexed, published ↓)`, for the Episode List.
 
 <!--
 The emulator doesn't need the indexes; the real database refuses the query without them
@@ -478,24 +611,51 @@ Billing reports lag by up to a day: look the next morning, under Billing → Rep
 
 ---
 
-## Search finds what was *said*, not titles
+## Test before you pay: does the header's wording matter?
 
-Only transcript text is embedded. Episode titles never are.
+Since Phase 0, every transcript starts with its **header**: the title and description as lines at 0:00.
+With MiniLM that was free to change. With Vertex, changing it later means **re-embedding everything**.
+So before the full backfill, we tested four ways to give the model the title:
 
-| Query | Psalm 3: A Deposed King's Desperate Plea |
-|---|---|
-| "Psalm 3 A Deposed King" | not in the top 5 |
-| "Absalom chases David out of Jerusalem" | **#1**, similarity 0.667, best line at [17:51](https://afp-597195-injected.calisto.simplecastaudio.com/695767b0-cd40-4e6c-ac8c-ac6bc0df77ee/episodes/4bedc88e-842e-4f9b-8c44-eaa45f7d17ec/audio/128/default.mp3?aid=rss_feed&awCollectionId=695767b0-cd40-4e6c-ac8c-ac6bc0df77ee&awEpisodeId=4bedc88e-842e-4f9b-8c44-eaa45f7d17ec&feed=3NVmUWZO#t=1071) |
+```text
+A  Podcast episode title: Psalm 5: David Pleads His Case        B  Psalm 5: David Pleads His Case
+   Podcast episode description: So far we've seen David ...        So far we've seen David ...
 
-> *"Absalom was in exile. David didn't engage him or try to even do anything to him ..."*
+C  (text) So far we've seen David ...     (API field) EmbedContentConfig(title="Psalm 5: ...")
+D  no header; every chunk embedded with the API's title field
+```
 
-Fixable: embed each chunk **with its episode title**. Decide **before** the full backfill:
-changing it later means paying to re-embed everything.
+16 title queries ("Psalm 5", "Ed Zitron", ...) and 5 topic queries, against the 15 episodes in the cloud.
+Cost: **$0.016** (52k tokens, run twice).
 
 <!--
-The title query competes with every episode where people talk about David as king.
-Alternatives: a separate title search (cheap: one vector per episode), or a keyword search
-on titles next to the vector search (hybrid search).
+The API's `title` field goes in the request's settings, so it applies to every text in that request:
+C and D need one request per episode instead of 50 texts per request. There is no `description` field.
+Script: phase_2_firebase_app/experiments/title_test.py (reads the chunk vectors back from Firestore: free reads).
+-->
+
+---
+
+## The test results
+
+| Setup | Title queries: #1 | Topic queries: #1 | Lead over the next-best episode |
+|---|---|---|---|
+| No title anywhere (transcript only) | 15 / 16 | 4 / 5 | - |
+| **A** labels (what Phase 0 does) | **16 / 16** | 4 / 5 | +0.098 (min +0.047) |
+| **B** plain title + description | **16 / 16** | 4 / 5 | +0.092 (min +0.040) |
+| **C** API `title` field | **16 / 16** | 4 / 5 | +0.097 (min +0.029) |
+| **D** title field on every chunk (3 episodes) | 4 / 4 | 1 / 1 | - |
+
+- **A, B and C tie.** The labels win by 0.006: noise. The labels stay: readable, any model, no special API.
+- **The header doesn't hurt topic searches:** the talk still wins those
+- **D** helped one title (0.704 → 0.749), lowered a topic query (0.693 → 0.674), and leaves out the description
+- **15 episodes is too easy:** even "no title" found Psalm 5. In Phase 1, with all ~600 BibleProject
+  episodes, "Psalm 3 A Deposed King" missed the top 5 without a header. Rerun after the full backfill.
+
+<!--
+Similarity = cosine similarity (1 = same direction). "Lead" = the target's title/description score
+minus the best score of any other episode's: how clearly it picks the right episode.
+The closest calls are the Psalms (Psalm 3 vs 4 vs 5), exactly the confusion we worried about.
 -->
 
 ---
@@ -539,8 +699,32 @@ Diff `phase_1_local_flask_app/app.py` against `phase_2_firebase_app/functions/ap
 | summary cache: a local folder | a `summaries` collection | an instance has no lasting disk, and instances share one cache |
 | static files, `/` redirect, `app.run()` | gone | Hosting and the function host do those jobs |
 | `.env` via `python-dotenv` | an environment variable from Secret Manager | |
+| prompts in `prompts/*.txt` | prompts in the `prompts` collection | edit them live, no deploy |
 
-Everything else (routes, caps, prompts, best lines, rerun dropping) is the same code.
+Everything else (routes, caps, best lines, rerun dropping) is the same code.
+
+---
+
+## Prompts you can edit without a deploy
+
+On your laptop, a prompt file was easy to edit: save, reload. In the cloud, a file in `functions/`
+means **edit → deploy → wait ~2 minutes** for every wording change. So the prompts moved to Firestore:
+
+```
+prompts/system   {text: "You are a guide to one podcast episode, like a librarian ..."}
+prompts/user     {text: "My question: {question}\nHelp me figure out where to listen ..."}
+```
+
+- `python set_prompts.py --cloud` puts the starting text there from `prompts/*.txt` (never overwrites
+  an edit unless `--force`)
+- **Edit in the console** (Firestore → `prompts` → `user` → `text`), **reload the episode page**: new answer
+- Read on **every request** (1 read, free tier), and the cache key includes a hash of both texts
+
+<!--
+This is configuration as data: the same idea as the podcast list living in Firestore.
+Copy good console edits back into prompts/*.txt so git keeps them.
+Missing prompts give a clear error ("run set_prompts.py") instead of a silent fallback.
+-->
 
 ---
 
@@ -662,6 +846,8 @@ gcloud logging read 'resource.labels.service_name="stop-billing"' --freshness=1d
 
 - **Bundle ChromaDB and MiniLM in a container:** a hack we'd undo in Phase 3
 - **Vertex AI Vector Search:** an always-on endpoint (the $1,832 machine)
+- **Hybrid search** (vectors + keywords): Google's built-in one is Agent Retrieval (Vector Search 2.0),
+  always-on again; Firestore's keyword search needs a new Enterprise database. A future project.
 - **Cloud Storage for transcripts:** they fit in Firestore
 - **Cloud Run with a Dockerfile:** with no data in the image, a function is simpler
 - **Login, App Check, per-user cost caps:** Project 2. For now: `max_instances=2`, the Phase 1 chat caps, and the kill switch.
@@ -686,10 +872,8 @@ Teams may share one instructor-provided billing account (education credits) inst
 
 ## The plan: Phase 3 next
 
-<img src="../images/project1_phases.svg" width="900" alt="Phase 0 → Phase 1 → Phase 2 → Phase 3">
+<img src="../images/project1_phases_phase3.svg" width="900" alt="Phase 0 → Phase 1 → Phase 2 → Phase 3, with Phase 3 highlighted">
 
-A new episode came out and our app didn't have it, because a person forgot to run stage 2.
+A new episode came out and we want our app to automatically pick it up.
 
-Phase 3: a **pipeline** in the cloud. A daily scheduled function checks the feeds, transcribes new
-episodes (feed transcripts, or Whisper on a GPU), chunks, embeds and **upserts** them,
-plus a button to run it by hand.
+Phase 3: a **pipeline** in the cloud! A daily scheduled function checks the feeds, transcribes new episodes and does all necessary **upserting** in the cloud. This happens automatically, but there is also a manually triggered backup.

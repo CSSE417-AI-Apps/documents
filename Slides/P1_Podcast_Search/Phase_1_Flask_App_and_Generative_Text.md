@@ -113,6 +113,7 @@ Firebase Hosting serves static files only. Building it this way now makes Phase 
 |---|---|
 | `GET /api/podcasts` | the shows being searched |
 | `GET /api/search?q=...&skip=...` | 8 episode cards |
+| `GET /api/episodes/<podcast>?offset=0&limit=20` | Episode List: 20 episodes, newest first |
 | `GET /api/episode/<podcast>/<slug>` | episode details + every transcript line |
 | `GET /api/moments/<podcast>/<slug>?q=...` | where the question comes up in this episode |
 | `POST /api/summary` | the AI summary (cached) |
@@ -240,6 +241,7 @@ Same idea as the distinct-episodes trick in Phase 0: do the filtering where the 
 
 ```
 /index.html?q=Why+do+data+centers+use+so+much+water%3F&skip=bibleproject
+/index.html?list=bibleproject&n=40
 /episode.html?podcast=bibleproject&slug=...&q=...&t=2455&e=2458
 ```
 
@@ -250,6 +252,27 @@ Same idea as the distinct-episodes trick in Phase 0: do the filtering where the 
 history.pushState for a new search, history.replaceState for a filter change
 (a filter change shouldn't be a new Back step). Your choice of left-out podcasts
 is also remembered in localStorage for your next visit.
+-->
+
+---
+
+## The Episode List: sometimes you just want the latest episode
+
+<img src="../images/phase1_episode_list_links.png" width="430" alt="Each show tile on the home page has an Episode list link"> <img src="../images/phase1_episode_list.png" width="470" alt="BibleProject episodes, newest first">
+
+I wanted to play the newest BibleProject episode and had to **search** for it. Silly.
+
+- **Home page only:** an *Episode list* link under each show → `?list=bibleproject`
+- **Newest first, 20 at a time.** *Load more* asks for the next 20: `offset=20&limit=20`
+- `&n=40` in the URL remembers how many are showing, so **Back** from an episode returns to the same spot
+- The search box now says *Search BibleProject…*: it searches **only that show**
+
+<!--
+A "pseudo hidden" feature: the search page grows one URL flag instead of a new page.
+Only episodes with a transcript are listed (the episode page needs one).
+Search results and list entries are built by the same card() function in app.py.
+Opened from the list, the episode page has no question, so there's no summary; the chat opens
+once you search. Load more may also be handy one day for more than 8 search results.
 -->
 
 ---
@@ -271,6 +294,7 @@ Right: the conversation. The bar between them drags to resize.
 - Transcript lines are `<span>`s: **click a line to play from there**
 - While playing: highlight the current line and scroll along (binary search on `start`)
 - Stop scrolling along for a few seconds when the reader scrolls
+- The **header** (title + description at 0:00) is the first paragraph, labeled *Episode info*, with no time shown
 
 The audio streams **from the podcast's own host**. We never serve an mp3.
 
@@ -335,34 +359,85 @@ Project 2's long-context topic.
 
 ---
 
+## A librarian, not an answer shop
+
+Our first prompt asked Gemini *how the episode answers the question*. Then friends tried the app:
+
+> They read the answer and **closed the tab.** Here's your fish. Goodbye!
+
+That's the worst case for learning. Our goal is **discovery**: point people to where they should go
+listen. Like a librarian, we say **which book to read and which chapter to start with**.
+
+So the AI's job changed:
+
+- **Don't give away the answer:** describe the questions the episode explores, not its conclusions
+- **Say where to start:** from the beginning (context, a series), or jump to a moment
+- **Point to the moments** with timestamps, and **always end with a next step**
+- Asked for the answer directly? Point to the moment where they'll **hear** it
+
+<!--
+A product decision, made in the prompt. Before (Phase 1's first version):
+"Why is this episode a good match for my question? In 3-4 sentences, explain how it answers it."
+After: "...why is this episode a good place to explore my question? Should I start at the beginning
+for the context, or jump in? Which moments should I focus on? Don't tell me the answer; tell me
+where I'll hear it."
+The same rule, said twice: once as the system's job, once in the listener's own voice.
+-->
+
+---
+
+## What the librarian says
+
+*Psalm 5: David Pleads His Case*, for **"How should I pray when I feel attacked?"**
+
+> This episode is a great place to explore your question because it examines Psalm 5, where David approaches God like a shaken king waking up to face a crisis and makes a persuasive legal case for justice against his enemies. Start from the beginning to understand the narrative backdrop of David's situation and how these psalms are bundled together.
+> - **[0:57]** Why David approaches God like a judge at the city gates, framing his plea as a three-part argument ...
+> - **[40:49]** The complexity and honesty of David's character, ... when David himself has been the wrongdoer.
+> - **[57:12]** How the psalm ends with a response of preemptive joy, ... even before the answer arrives.
+>
+> Start at the beginning and listen through [45:30].
+
+Where to start, **three moments** (each a play button), a next step. **No answer.**
+
+<!--
+Real output, gemini-3.5-flash-lite, 2026-11-25 (lightly trimmed with ...).
+Still not perfect: "a three-part argument about God's character, their relationship, and his enemies"
+gives away some structure. Prompt engineering is iterative: try your own questions, read the
+answers, adjust the rules.
+-->
+
+---
+
 ## The prompt is a file
 
 `prompts/system.txt`
 ```
-You help people explore podcast episodes. ...
+You are a guide to one podcast episode, like a librarian who knows exactly which shelf to send
+someone to. Your job is NOT to answer the listener's question. Your job is to get them listening ...
 Rules:
-- Answer only from the episode material below. If it doesn't address the question, say so plainly.
-- Cite the moments you rely on with their timestamps exactly as written, e.g. [12:34].
-- You may use **bold**, *italics* and short bullet lists when they help. No headings, tables or links.
+- Don't give away the answer. Describe the questions the episode explores, ...
+- Point to moments with their timestamps exactly as written, e.g. [12:34]. ...
+- Say whether to start from the beginning ... or to jump straight to a moment. ...
+- Always end with one concrete next step, e.g. "Start at the beginning and listen through [24:10]."
+- Shape of your first answer: one or two sentences ...; then a bullet list of at most 3 moments ...
 
-Podcast: {podcast}
-Episode: {episode_title} ({published})
-Description: {description}
-Nearby episodes of this podcast, oldest first (titles only):
-{nearby_episodes}
-Transcript excerpts (in time order; [...] marks skipped parts of the episode):
-{excerpts}
+Podcast: {podcast}   Episode: {episode_title} ({published})   Description: {description}
+Nearby episodes of this podcast, oldest first (titles only): {nearby_episodes}
+Transcript excerpts (in time order; [...] marks skipped parts of the episode): {excerpts}
 ```
 
-`prompts/summary_request.txt`
+`prompts/user.txt`
 ```
 My question: {question}
-Why is this episode a good match for my question? In 3-4 sentences, explain how it answers it.
+Help me figure out where to listen to learn about this. Why is this episode a good place to explore
+my question? Should I start at the beginning for the context, or jump in? Which moments (at most 3)
+should I focus on? Don't tell me the answer; tell me where I'll hear it.
 ```
 
 <!--
 Prompt text lives in plain text files, not in Python and not in JSON (no \n escapes; git diffs
 show exactly which words changed). The code only fills in the {placeholders}.
+Two files: system.txt (the AI's job + the episode) and user.txt (the listener's first message).
 Nearby episodes: titles of the 3 episodes before and after by date. Series episodes come out
 back to back, so the model sees the rest of the series without any series data.
 -->

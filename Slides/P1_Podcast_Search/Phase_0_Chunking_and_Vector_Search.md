@@ -423,6 +423,8 @@ Both paths produce the same shape: text **and timed segments**.
   "slug": "2025-was-the-year-of-agents-what-s-coming-in-2026",
   "source": "feed_vtt",
   "segments": [
+    {"start": 0, "end": 0, "speaker": "Episode info", "text": "Podcast episode title: 2025 Was the Year of ..."},
+    {"start": 0, "end": 0, "speaker": "Episode info", "text": "Podcast episode description: Chris and Daniel ..."},
     {"start": 149.74, "end": 161.03, "speaker": "Daniel", "text": "I'm already a year ahead, I guess. ..."},
     {"start": 161.04, "end": 161.84, "speaker": "Chris",  "text": "I'm okay with that."}
   ]
@@ -437,6 +439,34 @@ Practical AI's feed names its speakers (Daniel, Chris, and "Sponsor" for ad read
 Tech Won't Save Us uses SPEAKER_00, SPEAKER_01. Whisper gives no speakers at all (speaker: null).
 If your podcast publishes transcripts without timestamps, you can still search,
 but you can't jump the player to the right moment. That's a real tradeoff for your team.
+-->
+
+---
+
+## The header: the title and description, "read out" at 0:00
+
+Search finds what was **said**. But people also search for a **title** ("Psalm 3", "Ed Zitron"),
+and a description summarizes the whole episode in a few sentences.
+
+So `s3` starts every transcript with **header lines**:
+
+- `Podcast episode title: ...` then `Podcast episode description: ...` (long descriptions: more lines of ≤300 characters)
+- `start = end = 0` and speaker **`Episode info`**: as if someone read them out very quickly
+- The **labels** tell the embedding model what each part is
+
+Every later stage just treats them as transcript: chunked, embedded, searched, shown, sent to Gemini.
+**Nothing special anywhere else.**
+
+<!--
+Rerunning s3 refreshes the header of every existing transcript from episodes.json (seconds, no Whisper),
+so a changed description shows up; then rerun s4 and s5 with --force.
+Measured with MiniLM, 1000-character chunks, all ~1,500 episodes (2026-11-25):
+  "Psalm 3 A Deposed King": not in the top 5 without a header -> #3 with it
+  "Psalm 3: A Deposed King's Desperate Plea" (full title) -> #1;  "Psalm 5: David Pleads His Case" -> #1 (0.737)
+  "Episode titled Psalm 5" -> #5, behind the Psalm 1-2, 3 and 4 headers: a small model barely tells
+  "Psalm 3" from "Psalm 5". Numbers and exact names are what keyword (hybrid) search is good at.
+  "Ed Zitron" -> three headers that name him, top 3.
+The pages show header lines without a timestamp.
 -->
 
 ---
@@ -519,6 +549,7 @@ def chunk_segments(segments, size, overlap):
 
 - About 30 lines of plain Python, no libraries
 - Runs in **seconds** for every podcast
+- The **header** is chunked on its own, so chunk `000` starts with the title and never mixes it with the talk
 - `--size 500` for the small chunks; overlap defaults to 100 for 500 and 150 for 1000
 
 <!--
